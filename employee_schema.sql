@@ -1,14 +1,9 @@
---This SQL should be run only once.
---Drop the DB if it exists.
-
---Create the DB
+DROP DATABASE employee_db;
 CREATE DATABASE employee_db;
 
---Use this db for the rest of the script
+
 USE employee_db;
 
---Lets create the tables:
---Department
 
 CREATE TABLE department(
     department_id int AUTO_INCREMENT NOT NULL,
@@ -16,7 +11,7 @@ CREATE TABLE department(
     PRIMARY KEY(department_id)
 );
 
-CREATE TABLE role(
+CREATE TABLE emp_role(
     role_id int AUTO_INCREMENT NOT NULL,
     title varchar(30),
     salary DECIMAL(6,2),
@@ -30,7 +25,34 @@ CREATE TABLE employee(
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     role_id int NOT NULL,
-    FOREIGN KEY(role_id) INT REFERENCES role(role_id),
-    manager_id INT reference employee(emp_id), -- this can be null.
+    FOREIGN KEY(role_id) REFERENCES emp_role(role_id),
+    manager_id INT REFERENCES employee(emp_id), -- this can be null.
     PRIMARY KEY(emp_id)
 );
+
+
+
+-- Inserted a set of records into the table
+INSERT INTO department (name)
+VALUES ("Corporate");
+
+INSERT INTO department (name)
+VALUES ("Sales");
+
+INSERT INTO department (name)
+VALUES ("Support");
+
+select * FROM department;
+
+UPDATE department
+set name = "Support"
+where department_id =3;
+
+INSERT INTO role (title,salary)
+VALUES ("Manager", 25, 3);
+
+INSERT INTO role (title,salary)
+VALUES ("CEO", 50, 0);
+
+INSERT INTO role (title,salary)
+VALUES ("Employee", 10, 3);
