@@ -1,6 +1,7 @@
 //Lets load dependencies
 const inquirer = require('inquirer');
 var mysql = require("mysql");
+const utils = require("utils");
 
 
 
@@ -34,14 +35,15 @@ function  menu(){
         type: 'list',
         message: 'What would you like to do?',
         name: 'option',
-        choices: ["View Employees", "Add Employee","Update Employee","Update Employee"],
+        choices: ["View Employees", "Add Employee","Update Employee","Remove Employee"],
       },
     ])
     .then((response) =>{
   
       switch(response.option){
           case "View Employees":
-              getEmployees();
+              //getEmployees();
+              showEmployees();
               break;
           
           case "Add Employee":
@@ -56,19 +58,33 @@ function  menu(){
 }
 
 
- function getEmployees(){
+const getEmployees = () => {
      //This guy gets the employees
-
-     connection.query("SELECT * FROM employee", function(err, result) {
-        if (err) throw err;
-        console.log(result);
-
+    
+     
+    return new Promise ((resolve, reject)=>{
+      connection.query("SELECT * FROM employee", (err,result)=>{
+        if(err)reject(err);
+        resolve(result);
+      });
+      
     });
  }
 
 
+const showEmployees = () => {
+  
+  getEmployees().then((result)=>{
+    for(var emp in result){
+    //Get only the title.
 
-function showEmployees(){
+    console.log(emp+1 + " "+ result[emp].first_name);
+  }
+  }).catch((err)=>{
+    console.log(err);
+  });
+
+  
 
 }
 
@@ -126,7 +142,9 @@ function showEmployees(){
     }
     
     //Lets create an insert statement here...
-    connection.query(`INSERT INTO employee(first_name,last_name,role_id) values (${first_name},${last_name},${chosen_roleID})`, function(err, result) {
+    var query = `INSERT INTO employee(first_name,last_name,role_id) values ("${first_name}","${last_name}","${chosen_roleID}")`
+    console.log("Q: ", query)
+connection.query(query, function(err, result) {
       if (err) throw err;
   });
      menu();
@@ -135,6 +153,51 @@ function showEmployees(){
 
  function removeEmployee(){
      //this guy removes an employee
+    //We need to find the employee to delete.
+    //We can ask for the user of the id...
+    //For that we can display the id of the users(This can be done with display employees)
+    getEmployees();
+    inquirer
+    .prompt([
+      {
+        type: 'number',
+        message: 'Which employee ID would you like to delete?',
+        name: 'employee',
+      },
+    ])
+    .then((response) =>{
+            //Nested Inquirer HAHAHA
+            //Confirm and then continue.
+            let employeeTODelete = response.employee;
+            inquirer
+              .prompt([
+                {
+                  type: 'list',
+                  message: 'Are you sure you want to delete employee' + employeeTODelete+'?',
+                  choices: ["Yes", "No"],
+                  name: 'confirm',
+                },
+              ])
+              .then((response) =>{
+
+                //Perform delete code:
+              //   var q = "DELETE FROM employee WHERE";
+
+              //  connection.query(q, function(err, result) {
+              //   if (err) throw err;
+
+              //   for(var res in result){
+              //     //Get only the title.
+              //     emp_list[res] = result[res];
+              //     console.log(res+1 + " "+ emp_list[res].first_name);
+              //   }
+              //   menu();
+
+     });
+
+
+     
+  });
  }
 
  menu();
